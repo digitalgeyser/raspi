@@ -31,6 +31,11 @@ while button > 0:
   time.sleep(delay)
   button = GPIO.input(24)
 
+
+GPIO.output(18, GPIO.HIGH)
+GPIO.output(17, GPIO.HIGH)
+time.sleep(0.5)
+
 GPIO.cleanup()
 
 
