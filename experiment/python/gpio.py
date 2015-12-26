@@ -1,21 +1,17 @@
+#!/usr/bin/python
+
 import RPi.GPIO as GPIO
 import time
+import c
 
 delay=0.05
+blue=18
+yellow=17
 
-GPIO.setmode(GPIO.BCM)
-
-print "GPIO mode: ", GPIO.getmode(), "(BCM = ", GPIO.BCM, ", BOARD = ", GPIO.BOARD, ")"
-print "GPIO RPI info:", GPIO.RPI_INFO
-print "GPIO version: ", GPIO.VERSION
+c.init()
 print "\nPush the button to quit..."
-
-GPIO.setup(18, GPIO.OUT, initial=GPIO.HIGH)
-GPIO.setup(17, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-GPIO.output(18, GPIO.HIGH)
-GPIO.output(17, GPIO.HIGH)
+c.blueOn()
+c.yellowOff()
 
 time.sleep(delay)
 
@@ -23,17 +19,16 @@ button=1
 x = 1
 while button > 0:
   x+=1
-  GPIO.output(18, GPIO.HIGH)
-  GPIO.output(17, GPIO.LOW)
+  c.blueOn()
+  c.yellowOff()
   time.sleep(delay)
-  GPIO.output(18, GPIO.LOW)
-  GPIO.output(17, GPIO.HIGH)
+  c.blueOff()
+  c.yellowOn()
   time.sleep(delay)
   button = GPIO.input(24)
 
-
-GPIO.output(18, GPIO.HIGH)
-GPIO.output(17, GPIO.HIGH)
+c.blueOn()
+c.yellowOn()
 time.sleep(0.5)
 
 GPIO.cleanup()
