@@ -1,7 +1,7 @@
-all: spi
+all: gpio2
 
-spi: spi.o
-	cc -o spi spi.o -lwiringPi
+gpio2: gpio2.o
+	cc -o gpio2 gpio2.o -lwiringPi
 
 clean:
-	rm -f *.o spi
+	rm -f *.o gpio2
