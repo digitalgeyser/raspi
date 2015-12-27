@@ -14,3 +14,4 @@ run: xpt
 
 clean:
 	rm -f *.o xpt
+
