@@ -1,7 +1,14 @@
+
 all: gpio2
 
 gpio2: gpio2.o
-	cc -o gpio2 gpio2.o -lwiringPi
+	cc -g -o gpio2 gpio2.o -lwiringPi
+
+gpio2.o: gpio2.c
+	cc -g -o gpio2.o -c gpio2.c
+
+debug: gpio2
+	sudo kdbg ./gpio2
 
 run: gpio2
 	sudo ./gpio2
