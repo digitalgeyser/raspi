@@ -1,4 +1,3 @@
 *.o
-spi
 *.pyc
 experiment/wiringPi/gpio2
