@@ -10,7 +10,7 @@ debug: xpt
 	sudo kdbg ./xpt
 
 run: xpt
-	sudo ./xpt 0 0
+	sudo ./xpt 0 0 3
 
 clean:
 	rm -f *.o xpt
