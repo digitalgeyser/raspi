@@ -27,44 +27,45 @@ static int printtdiff(struct timeval *start, struct timeval *current) {
 
 
 // pass SPI_MODE_0, SPI_MODE_1, SPI_MODE_2 or SPI_MODE_3
-void spimode(int channel, int mode) 
-{
+void spimode(int channel, int spiMode) {
    int fd;
    char mode;
-
+   
+   /* read mode */
+   ioctl(fd,SPI_IOC_RD_MODE,&mode);
+   printf("SPI mode:  %u -> ",mode);
    if ( channel == 0 )
      fd = open("/dev/spidev0.0", O_RDWR);
-     else
-   fd = open("/dev/spidev0.1", O_RDWR);
-
-   if (fd >= 0)
-   {
+   else
+     fd = open("/dev/spidev0.1", O_RDWR);
+   
+   if (fd >= 0) {
       /* write mode */
-      mode = mode;
+      mode = spiMode;
       ioctl(fd,SPI_IOC_WR_MODE,&mode);
 
       /* read mode */
       ioctl(fd,SPI_IOC_RD_MODE,&mode);
-      printf("mode = %u\n",mode);
+      printf("%u\n",mode);
    }
 
    close(fd);
 }
 
-int main (int argc, char **argv)
-{
+int main (int argc, char **argv) {
   int channel, n, i;
   uint8_t data[LEN];
   struct timeval startTime;
   struct timeval tv;
   
   channel = 0;
+  spimode(channel, SPI_MODE_1);
   wiringPiSPISetup(channel, FREQUENCY);
   gettimeofday(&startTime, NULL);
 
   memset(data, 0, LEN);
   
-  while(1) {
+  do {
     data[0] = 0xF7;
     gettimeofday(&tv, NULL);
 
@@ -80,5 +81,7 @@ int main (int argc, char **argv)
     }
     printf("\n");
     usleep(10000);
-  }
+  } while(tv.tv_sec - startTime.tv_sec < 10);
+
+  return 0;
 }
