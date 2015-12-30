@@ -5,6 +5,9 @@
 #include <sys/time.h>
 #include <string.h>
 #include <stdint.h>
+#include <linux/spi/spidev.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 
 //125 kHz is max
 #define FREQUENCY 100000
@@ -22,6 +25,32 @@ static int printtdiff(struct timeval *start, struct timeval *current) {
   }
 }
 
+
+// pass SPI_MODE_0, SPI_MODE_1, SPI_MODE_2 or SPI_MODE_3
+void spimode(int channel, int mode) 
+{
+   int fd;
+   char mode;
+
+   if ( channel == 0 )
+     fd = open("/dev/spidev0.0", O_RDWR);
+     else
+   fd = open("/dev/spidev0.1", O_RDWR);
+
+   if (fd >= 0)
+   {
+      /* write mode */
+      mode = mode;
+      ioctl(fd,SPI_IOC_WR_MODE,&mode);
+
+      /* read mode */
+      ioctl(fd,SPI_IOC_RD_MODE,&mode);
+      printf("mode = %u\n",mode);
+   }
+
+   close(fd);
+}
+
 int main (int argc, char **argv)
 {
   int channel, n, i;
@@ -29,7 +58,7 @@ int main (int argc, char **argv)
   struct timeval startTime;
   struct timeval tv;
   
-  channel = 1;
+  channel = 0;
   wiringPiSPISetup(channel, FREQUENCY);
   gettimeofday(&startTime, NULL);
 
