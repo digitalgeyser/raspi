@@ -1,3 +1,4 @@
 *.o
 *.pyc
 experiment/wiringPi/gpio2
+experiment/xpt2046/xpt

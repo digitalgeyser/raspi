@@ -2,18 +2,54 @@
 #include <stdlib.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
+#include <sys/time.h>
+#include <string.h>
+#include <stdint.h>
 
-#define CHANNEL 1
-#define LEN 1000
+//125 kHz is max
+#define FREQUENCY 100000
+#define LEN 2
 
-int main (void)
+static int printtdiff(struct timeval *start, struct timeval *current) {
+  if ( current -> tv_usec >= start -> tv_usec ) {
+    printf("%05ld.%06ld",
+	   current->tv_sec - start -> tv_sec,
+	   current->tv_usec - start -> tv_usec);
+  } else {
+    printf("%05ld.%06ld",
+	   current->tv_sec - start ->tv_sec - 1,
+	   1000000 + current->tv_usec - start -> tv_usec);
+  }
+}
+
+int main (int argc, char **argv)
 {
-  int n;
-  char data[LEN];
-  wiringPiSPISetup(CHANNEL, 500000);
+  int channel, n, i;
+  uint8_t data[LEN];
+  struct timeval startTime;
+  struct timeval tv;
+  
+  channel = 1;
+  wiringPiSPISetup(channel, FREQUENCY);
+  gettimeofday(&startTime, NULL);
+
+  memset(data, 0, LEN);
+  
   while(1) {
-    n = wiringPiSPIDataRW(CHANNEL, data, LEN); 
-    printf("Received: %d\n");
-    usleep(1000);
+    data[0] = 0xF7;
+    gettimeofday(&tv, NULL);
+
+    printtdiff(&startTime, &tv);
+    printf(" - %d:", n);
+    for ( i = 0; i<LEN; i++ ) {
+      printf("%02x", data[i]);
+    }
+    n = wiringPiSPIDataRW(channel, data, LEN);
+    printf(" => ");
+    for ( i=0; i<LEN; i++ ) {
+      printf("%02x", data[i]);
+    }
+    printf("\n");
+    usleep(10000);
   }
 }
