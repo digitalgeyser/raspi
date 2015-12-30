@@ -9,9 +9,13 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+// Pin 22 is the interrupt pin.
+
 //125 kHz is max
 #define FREQUENCY 100000
 #define LEN 2
+
+#define INT_GPIO 22
 
 static int printtdiff(struct timeval *start, struct timeval *current) {
   if ( current -> tv_usec >= start -> tv_usec ) {
@@ -76,13 +80,23 @@ int main (int argc, char **argv) {
   printf("Channel %d, spi mode %d, scan for %d seconds.\n", channel, spiMode, seconds);
   spimode(channel, spiMode);
   wiringPiSPISetup(channel, FREQUENCY);
+
+  // Now set up the interrupt line. 
+  wiringPiSetupGpio();
+  pinMode(INT_GPIO, INPUT);
+
   gettimeofday(&startTime, NULL);
 
   memset(data, 0, LEN);
   
   do {
+    int touchInterrupt = digitalRead(INT_GPIO);
+
     data[0] = 0xF7;
     gettimeofday(&tv, NULL);
+
+    if ( touchInterrupt ) 
+      printf("TOUCH DETECTED!\n");
 
     printtdiff(&startTime, &tv);
     printf(" - %d:", n);
@@ -101,7 +115,7 @@ int main (int argc, char **argv) {
       printf("\r");
     else 
       printf("\n");
-    usleep(10000);
+    usleep(1000);
   } while(tv.tv_sec - startTime.tv_sec < seconds);
 
   return 0;
