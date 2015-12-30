@@ -54,12 +54,26 @@ void spimode(int channel, int spiMode) {
 
 int main (int argc, char **argv) {
   int channel, n, i;
+  int spiMode, allzeroes;
   uint8_t data[LEN];
   struct timeval startTime;
   struct timeval tv;
+
+  if ( argc != 3 ) {
+    printf("Usage: xpt <channel> <spiMode>\n");
+    return;
+  }
   
-  channel = 0;
-  spimode(channel, SPI_MODE_1);
+  channel = atoi(argv[1]);
+  switch(atoi(argv[2])) {
+    case 0: spiMode = SPI_MODE_0; break;
+    case 1: spiMode = SPI_MODE_1; break;
+    case 2: spiMode = SPI_MODE_2; break;
+    case 3: spiMode = SPI_MODE_3; break;
+  }
+  
+  printf("Channel %d, spi mode %d\n", channel, spiMode);
+  spimode(channel, spiMode);
   wiringPiSPISetup(channel, FREQUENCY);
   gettimeofday(&startTime, NULL);
 
@@ -76,10 +90,16 @@ int main (int argc, char **argv) {
     }
     n = wiringPiSPIDataRW(channel, data, LEN);
     printf(" => ");
+    allzeroes = 1;
     for ( i=0; i<LEN; i++ ) {
       printf("%02x", data[i]);
+      if ( data[i] != 0 )
+        allzeroes = 0;
     }
-    printf("\n");
+    if ( allzeroes ) 
+      printf("\r");
+    else 
+      printf("\n");
     usleep(10000);
   } while(tv.tv_sec - startTime.tv_sec < 10);
 
