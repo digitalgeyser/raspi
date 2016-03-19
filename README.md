@@ -1,1 +1,1 @@
-Digital Geyser Raspberry Pi public repo.
+Digital Geyser Raspberry Pi public repository.
